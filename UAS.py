@@ -72,8 +72,9 @@ max_year = int(df.max(axis=0)['tahun'])
 df_topcum = df_cum.sort_values(by='kumulatif', ascending=False, axis=0)
 
 #Title Aplikasi
-st.title("Analisis Data Produksi Minyak Mentah Dunia")
+st.title("Aplikasi Analisis Data Produksi Minyak Mentah Dunia")
 st.subheader ("by Jihan Syakinah A.")
+st.subheader ("12220062")
 st.subheader("Pilih Fitur Aplikasi di Bawah!")
 
 #Informasi Keseluruhan Tahun
