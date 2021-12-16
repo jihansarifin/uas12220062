@@ -114,7 +114,7 @@ with st.expander("Rangkuman Informasi Keseluruhan Tahun "):
 
 
 #Data Informasi pada Tahun T
-with st.expander("Rangkuman Informasi Tahun T"):
+with st.expander("Rangkuman Informasi pada Tahun T"):
     set_year = int(st.slider('Tahun (T)', min_value=min_year, max_value=max_year, help="Masukkan tahun", key="rangkuman"))
     df_year = df.loc[df['tahun'] == set_year]
     st.subheader("Negara Produksi Terbesar")
