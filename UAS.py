@@ -4,12 +4,11 @@
 
 
 
-#IMPORT
+#IMPORT library
 import streamlit as st
 import pandas as pd
 import json
 import numpy as np
-import csv
 
 #Konversi Kode Negara ke Nama Negara Lengkap
 def a3df_to_namedf(df, countryList):
@@ -60,12 +59,12 @@ for elmt in jfile:
     countryElmt = [name, alpha_3, country_code, region, region, sub_region]
     countryList.append(countryElmt)
 
-# remove some country not in json
+#Menghapus negara not in json
 notInJSON = ["WLD", "G20", "EU28", "OECD"]
 for x in notInJSON:
     df = df[df['kode_negara'] != x]
 
-# cumulative dataframe
+#dataframe kumulatif
 df['kumulatif'] = df.groupby(['kode_negara'])['produksi'].cumsum()
 df_cum = df.drop_duplicates('kode_negara', keep="last")
 min_year = int(df.min(axis=0)['tahun'])
@@ -103,10 +102,10 @@ with st.expander("Rangkuman Informasi Keseluruhan Tahun "):
     st.write("Kode Negara: " + country[1])
     st.write("Region: " + country[3])
     st.write("Subregion: " + country[4])
-    st.write("Produksi terkecilr keseluruhan tahun: " + str(clean_cum.loc[minIdx, 'kumulatif']))
+    st.write("Produksi terkecil keseluruhan tahun: " + str(clean_cum.loc[minIdx, 'kumulatif']))
 
     #Produksi nol kumulatif
-    st.subheader("Negara-negara produksi nol")
+    st.subheader("Negara-negara Produksi Nol")
     df_zero_cum = getZeros(df_cum).reset_index(drop=True)
     df_zero_cum.index += 1
     df_zero_cum2 = addStatus(df_zero_cum, countryList)
@@ -144,25 +143,25 @@ with st.expander("Rangkuman Informasi Tahun T"):
     st.write("Produksi terkecil tahun " + str(set_year) + " : " + str(clean_year.loc[minIdx, 'produksi']))
 
     #Produksi nol kumulatif
-    st.subheader("Negara-negara produksi nol")
+    st.subheader("Negara-negara Produksi Nol")
     df_zero_year = getZeros(df_year).reset_index(drop=True)
     df_zero_year.index += 1
     df_zero_year2 = addStatus(df_zero_year, countryList)
     st.table(df_zero_year2)
     
 
-# dataframe produksi terbesar N negara Tahun T
-with st.expander("Grafik produksi N negara terbesar pada tahun T "):
+#dataframe produksi terbesar N negara Tahun T
+with st.expander("Grafik Produksi N Negara Terbesar pada Tahun T "):
     set_year = int(st.slider('Masukkan tahun (T)', min_value=min_year, max_value=max_year, help="Masukkan tahun"))
     set_n = int(st.number_input('Masukkan berapa negara terbesar (N):', min_value=1, max_value=len(countryList)-1, help="masukkan tahun", key="grafik2", value=3))
     df_year2 = df.loc[df['tahun'] == set_year]
     df_topn = df_year2.sort_values(by='produksi', ascending=False, axis=0)
     bar_topn = df_topn[['kode_negara', 'produksi']].head(set_n)
-    st.write("Grafik produksi " + str(set_n) + " negara terbesar pada tahun" + str(set_year))
+    st.write("Grafik Produksi " + str(set_n) + " Negara Terbesar pada Tahun" + str(set_year))
     st.bar_chart(bar_topn.set_index('kode_negara'))
 
-# dataframe produksi minyak suatu negara x
-with st.expander("Grafik produksi minyak negara X"):
+#dataframe produksi minyak suatu negara x
+with st.expander("Grafik Produksi Minyak Negara X"):
     ctry = st.selectbox("Negara: ", (i[0] for i in countryList))
     for x in countryList:
         if x[0] == ctry:
@@ -171,7 +170,7 @@ with st.expander("Grafik produksi minyak negara X"):
     if not((df['kode_negara'] == set_country_code).any()):
         st.write("Tidak tersedia")
     else:
-        st.write("Grafik produksi minyak " + str(ctry))
+        st.write("Grafik Produksi Minyak " + str(ctry))
         df_country = df.loc[df['kode_negara'] == set_country_code]
         # grafik produksi suatu negara
         line_country = df_country[["tahun", "produksi"]]
@@ -179,10 +178,10 @@ with st.expander("Grafik produksi minyak negara X"):
 
 
 # dataframe produksi kumulatif N negara terbesar
-with st.expander("Grafik produksi kumulatif N negara terbesar"):
+with st.expander("Grafik Produksi Kumulatif N Negara Terbesar"):
     set_n2 = int(st.number_input('Masukkan berapa negara terbesar (N)', min_value=1, max_value=len(countryList)-1, help="masukkan N", key='grafik3', value=3))
     bar_topcum = df_topcum[['kode_negara', 'produksi']].head(set_n2)
-    st.write("Grafik produksi kumulatif " + str(set_n2) + " negara terbesar")
+    st.write("Grafik Produksi Kumulatif " + str(set_n2) + " Negara Terbesar")
     st.bar_chart(bar_topcum.set_index('kode_negara'))
 
 
