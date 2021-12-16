@@ -1,9 +1,17 @@
+#NIM  : 12220062
+#NAMA : JIHAN SYAKINAH ARIFIN
+#UJIAN AKHIR SEMESTER PEMROGRAMAN KOMPUTER
+
+
+
+#IMPORT
 import streamlit as st
 import pandas as pd
 import json
 import numpy as np
 import csv
 
+#Konversi Kode Negara ke Nama Negara Lengkap
 def a3df_to_namedf(df, countryList):
     for i in countryList:
         df['kode_negara'] = df['kode_negara'].replace([i[1]], i[0])
@@ -14,12 +22,7 @@ def addFullCountryName(df, countryList):
         df['Nama Negara'] = df['Nama Negara'].replace([i[1], i[0]])
     return df
 
-def makeZeroDf(df, countryList):
-    df['Nama Negara'] = 0
-    for i in countryList:
-        df['Nama Negara'] = df['Nama Negara'].replace([i[1], i[0]])
-    return df
-
+#Data Frame Produksi tidak = 0
 def noZeros(df):
     return df[df['produksi'] != 0]
 def noZeros_cum(df):
@@ -29,6 +32,7 @@ def getZeros(df):
 def getZeros_cum(df):
     return df[df['kumulatif'] == 0]
 
+#Melengkapi df
 def addStatus(df, countryList):
     df['Nama Negara'] = df['kode_negara']
     df['Region'] = df['kode_negara']
@@ -39,15 +43,11 @@ def addStatus(df, countryList):
         df['Sub Region'] = df['Sub Region'].replace([i[1]], i[4])
     return df[['Nama Negara', 'Region', 'Sub Region']]
 
-
-
+#Open json dan csv
 file = open('kode_negara_lengkap.json')
 jfile = json.load(file)
 file.close()
 df = pd.read_csv("produksi_minyak_mentah.csv")
-
-
-
 
 # JSON Dictionary
 countryList = []
@@ -60,19 +60,10 @@ for elmt in jfile:
     countryElmt = [name, alpha_3, country_code, region, region, sub_region]
     countryList.append(countryElmt)
 
-
-
-
 # remove some country not in json
 notInJSON = ["WLD", "G20", "EU28", "OECD"]
 for x in notInJSON:
     df = df[df['kode_negara'] != x]
-
-df = df[df['kode_negara'] != "WLD"]
-
-
-
-
 
 # cumulative dataframe
 df['kumulatif'] = df.groupby(['kode_negara'])['produksi'].cumsum()
@@ -81,10 +72,13 @@ min_year = int(df.min(axis=0)['tahun'])
 max_year = int(df.max(axis=0)['tahun'])
 df_topcum = df_cum.sort_values(by='kumulatif', ascending=False, axis=0)
 
-st.title("Data Produksi Minyak Mentah Dunia")
-st.subheader("Informasi dan Grafik")
-# informasi keseluruhan tahun
-with st.expander("Rangkuman Informasi Keseluruhan Tahun: "):
+#Title Aplikasi
+st.title("Analisis Data Produksi Minyak Mentah Dunia")
+st.subheader ("by Jihan Syakinah A.")
+st.subheader("Pilih Fitur Aplikasi di Bawah!")
+
+#Informasi Keseluruhan Tahun
+with st.expander("Rangkuman Informasi Keseluruhan Tahun "):
     st.subheader("Negara Produksi Terbesar")
     maxIdx = (df_cum['kumulatif'].idxmax())
     for country in countryList:
@@ -97,6 +91,7 @@ with st.expander("Rangkuman Informasi Keseluruhan Tahun: "):
     st.write("Subregion: " + country[4])
     st.write("Produksi terbesar keseluruhan tahun: " + str(df_cum.loc[maxIdx, 'kumulatif']))
 
+    #Data Kumulatif Bersih
     clean_cum = noZeros_cum(df_cum)
     st.subheader("Negara Produksi Terkecil")
     minIdx = (clean_cum['kumulatif'].idxmin())
@@ -110,9 +105,7 @@ with st.expander("Rangkuman Informasi Keseluruhan Tahun: "):
     st.write("Subregion: " + country[4])
     st.write("Produksi terkecilr keseluruhan tahun: " + str(clean_cum.loc[minIdx, 'kumulatif']))
 
-
-
-
+    #Produksi nol kumulatif
     st.subheader("Negara-negara produksi nol")
     df_zero_cum = getZeros(df_cum).reset_index(drop=True)
     df_zero_cum.index += 1
@@ -120,13 +113,9 @@ with st.expander("Rangkuman Informasi Keseluruhan Tahun: "):
     st.table(df_zero_cum2)
 
 
-
-
-
-
-
+#Data Informasi pada Tahun T
 with st.expander("Rangkuman Informasi Tahun T"):
-    set_year = int(st.slider('Tahun (Y)', min_value=min_year, max_value=max_year, help="Masukkan tahun", key="rangkuman"))
+    set_year = int(st.slider('Tahun (T)', min_value=min_year, max_value=max_year, help="Masukkan tahun", key="rangkuman"))
     df_year = df.loc[df['tahun'] == set_year]
     st.subheader("Negara Produksi Terbesar")
     maxIdx = (df_year['produksi'].idxmax())
@@ -139,7 +128,8 @@ with st.expander("Rangkuman Informasi Tahun T"):
     st.write("Region: " + country[3])
     st.write("Subregion: " + country[4])
     st.write("Produksi terbesar tahun " + str(set_year) + " : " + str(df_year.loc[maxIdx, 'produksi']))
-
+    
+    #Data Kumulatif Bersih
     clean_year = noZeros(df_year)
     st.subheader("Negara Produksi Terkecil")
     minIdx = (clean_year['produksi'].idxmin())
@@ -153,6 +143,7 @@ with st.expander("Rangkuman Informasi Tahun T"):
     st.write("Subregion: " + country[4])
     st.write("Produksi terkecil tahun " + str(set_year) + " : " + str(clean_year.loc[minIdx, 'produksi']))
 
+    #Produksi nol kumulatif
     st.subheader("Negara-negara produksi nol")
     df_zero_year = getZeros(df_year).reset_index(drop=True)
     df_zero_year.index += 1
@@ -160,12 +151,9 @@ with st.expander("Rangkuman Informasi Tahun T"):
     st.table(df_zero_year2)
     
 
-
-
-
-# dataframe top n production on year y (2)
-with st.expander("Grafik produksi N negara terbesar pada tahun Y: "):
-    set_year = int(st.slider('Masukkan tahun (Y)', min_value=min_year, max_value=max_year, help="Masukkan tahun"))
+# dataframe produksi terbesar N negara Tahun T
+with st.expander("Grafik produksi N negara terbesar pada tahun T: "):
+    set_year = int(st.slider('Masukkan tahun (T)', min_value=min_year, max_value=max_year, help="Masukkan tahun"))
     set_n = int(st.number_input('Masukkan berapa negara terbesar (N):', min_value=1, max_value=len(countryList)-1, help="masukkan tahun", key="grafik2", value=3))
     df_year2 = df.loc[df['tahun'] == set_year]
     df_topn = df_year2.sort_values(by='produksi', ascending=False, axis=0)
@@ -173,7 +161,7 @@ with st.expander("Grafik produksi N negara terbesar pada tahun Y: "):
     st.write("Grafik produksi " + str(set_n) + " negara terbesar pada tahun" + str(set_year))
     st.bar_chart(bar_topn.set_index('kode_negara'))
 
-# dataframe country x (1)
+# dataframe produksi minyak suatu negara x
 with st.expander("Grafik produksi minyak negara X"):
     ctry = st.selectbox("Negara: ", (i[0] for i in countryList))
     for x in countryList:
@@ -190,7 +178,7 @@ with st.expander("Grafik produksi minyak negara X"):
         st.line_chart(line_country.set_index('tahun'))
 
 
-# dataframe cumulative top n (3)
+# dataframe produksi kumulatif N negara terbesar
 with st.expander("Grafik produksi kumulatif N negara terbesar"):
     set_n2 = int(st.number_input('Masukkan berapa negara terbesar (N)', min_value=1, max_value=len(countryList)-1, help="masukkan N", key='grafik3', value=3))
     bar_topcum = df_topcum[['kode_negara', 'produksi']].head(set_n2)
