@@ -152,7 +152,7 @@ with st.expander("Rangkuman Informasi Tahun T"):
     
 
 # dataframe produksi terbesar N negara Tahun T
-with st.expander("Grafik produksi N negara terbesar pada tahun T: "):
+with st.expander("Grafik produksi N negara terbesar pada tahun T "):
     set_year = int(st.slider('Masukkan tahun (T)', min_value=min_year, max_value=max_year, help="Masukkan tahun"))
     set_n = int(st.number_input('Masukkan berapa negara terbesar (N):', min_value=1, max_value=len(countryList)-1, help="masukkan tahun", key="grafik2", value=3))
     df_year2 = df.loc[df['tahun'] == set_year]
